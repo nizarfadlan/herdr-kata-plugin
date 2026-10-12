@@ -1,0 +1,4 @@
+/target/
+/bin/herdr-kata
+*.log
+.DS_Store

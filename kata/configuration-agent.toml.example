@@ -1,0 +1,28 @@
+# Example Kata configuration for agent microVMs (Phase 0 reference)
+#
+# This is documentation, not a drop-in file: the real Kata configuration lives
+# where your Kata installation put it
+# (e.g. /opt/kata/share/defaults/kata-containers/configuration.toml), and the
+# containerd runtime entry points at it via ConfigPath (see kata/README.md).
+#
+# Values below are the knobs that matter for herdr-kata-plugin; Phase 4 will
+# enforce per-profile vCPU/memory from profiles/*.json.
+
+[hypervisor.qemu]
+  # Path to the guest kernel image shipped by Kata.
+  # path = "/opt/kata/share/kata-containers/vmlinuz.container"
+
+  # Default vCPUs / memory per microVM; the plugin requests per-profile
+  # values where the hypervisor allows it.
+  # default_vcpus = 2
+  # default_memory = 4096
+
+[agent.kata]
+  # The Kata agent inside the guest; defaults are fine for the plugin.
+  # debug = false
+  # enable_tracing = false
+
+[runtime]
+  # Keep the guest minimal: no extra host mounts beyond what the plugin asks
+  # containerd for (worktree + agent config, read-only where possible).
+  # internetworking_model = "tcfilter"

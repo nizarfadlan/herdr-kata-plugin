@@ -1,0 +1,29 @@
+[package]
+name = "herdr-kata"
+version = "0.4.0"
+edition = "2021"
+description = "Herdr plugin that runs coding agents (Codex by default) inside Kata Containers microVMs."
+license = "Apache-2.0"
+publish = false
+rust-version = "1.80"
+
+[[bin]]
+name = "herdr-kata"
+path = "rust/src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.29.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+thiserror = "2"
+toml = "0.8"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+lto = true
+strip = true
+panic = "abort"
+codegen-units = 1

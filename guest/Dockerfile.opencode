@@ -1,0 +1,29 @@
+# Guest image for the OpenCode agent (Phase 2)
+#
+# Minimal image: the agent binary + CA certificates. Nothing else from the
+# host is baked in; the worktree and the agent config are mounted at launch.
+#
+# The tag is pinned at build time (see profiles/herdr-opencode-kata.json and
+# config.toml `image`). Do NOT use :latest in production.
+
+FROM debian:bookworm-slim
+ARG OPENCODE_VERSION=latest
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates curl iptables && \
+    rm -rf /var/lib/apt/lists/*
+# OpenCode's official install script; pin OPENCODE_VERSION for real use.
+RUN curl -fsSL https://opencode.ai/install.sh | sh -s -- --version "${OPENCODE_VERSION}" || \
+    curl -fsSL https://opencode.ai/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
+# A non-root user; the entrypoint drops to it after applying the firewall.
+RUN useradd -m -s /bin/bash agent && \
+    mkdir -p /home/agent/.local/bin && \
+    cp /root/.local/bin/opencode /home/agent/.local/bin/ 2>/dev/null || true
+# Egress firewall + entrypoint. No USER directive on purpose: the entrypoint
+# starts as root, applies the firewall, then drops to `agent` itself.
+COPY guest/egress.sh guest/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/egress.sh /usr/local/bin/entrypoint.sh
+ENV PATH="/home/agent/.local/bin:${PATH}"
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["opencode"]

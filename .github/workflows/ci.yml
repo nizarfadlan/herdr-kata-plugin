@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Format
+        run: cargo fmt --check
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Test
+        run: cargo test
+      - name: Shell syntax
+        run: |
+          sh -n bin/run.sh
+          sh -n scripts/install.sh
+          sh -n scripts/install-keybindings.sh
+          sh -n scripts/run-action.sh
+          sh -n guest/egress.sh
+          sh -n guest/entrypoint.sh

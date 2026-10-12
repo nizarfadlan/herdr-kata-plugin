@@ -1,0 +1,104 @@
+id = "kata.microvm"
+name = "Kata MicroVMs"
+version = "0.4.0"
+min_herdr_version = "0.9.0"
+description = "Run a coding agent (Codex by default) inside a Kata Containers microVM, one microVM per Herdr pane."
+platforms = ["linux"]
+
+[[build]]
+command = ["sh", "scripts/install-binary.sh"]
+
+[[actions]]
+id = "doctor"
+title = "Check Kata Containers prerequisites"
+description = "Check /dev/kvm, containerd, the Kata runtime and the guest image. Starts no agent."
+contexts = ["global", "workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "install-keybindings"
+title = "Install key bindings"
+description = "Add the plugin's key bindings to the Herdr config (start-agent, microvms, reconnect, open-shell) and reload it. Skips bindings that already exist."
+contexts = ["global", "workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "start-agent"
+title = "Start the configured agent in a Kata microVM"
+description = "Split a pane and launch the configured agent inside a Kata microVM with the current worktree granted read-write."
+contexts = ["workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "reconnect"
+title = "Resume the agent in a fresh microVM"
+description = "Launch the mapped agent again in a new microVM, with the adapter's resume arguments."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "open-shell"
+title = "Open a shell in a Kata microVM"
+description = "Split a pane and open an interactive shell in a new Kata microVM with the same profile and workspace grant as the focused pane's agent."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "stop"
+title = "Stop the agent's microVM"
+description = "Stop the Kata microVM of the agent tied to the focused pane. Files and the agent's saved conversation stay."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "info"
+title = "Show the microVM mapping"
+description = "Print the microVM name, agent, profile, workspace grant and last verification of the focused pane."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "verify-microvm"
+title = "Verify the running agent is confined"
+description = "Inspect the running microVM via containerd: Kata runtime, clean mounts, no host sockets reachable."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "prune-mappings"
+title = "Forget mappings whose pane is gone"
+description = "Drop every mapping whose Herdr pane no longer exists and whose microVM is not running."
+contexts = ["global", "workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "microvms"
+title = "Show the microVMs overlay"
+description = "Open the interactive overlay: every agent microVM with its pane and verification."
+contexts = ["global", "workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "list-microvms"
+title = "List agent microVMs"
+description = "List every pane-to-microVM mapping this plugin tracks with its container state and verification."
+contexts = ["global", "workspace", "pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[actions]]
+id = "forget-mapping"
+title = "Forget this pane's mapping"
+description = "Drop the mapping of the focused pane. Refuses while its microVM runs."
+contexts = ["pane"]
+command = ["sh", "bin/run.sh", "action"]
+
+[[events]]
+on = "worktree.removed"
+command = ["sh", "bin/run.sh", "events"]
+# Stops agents whose worktree was removed and forgets their mappings.
+
+[[panes]]
+id = "microvms"
+title = "Kata microVMs"
+placement = "overlay"
+command = ["sh", "bin/run.sh", "pane"]
