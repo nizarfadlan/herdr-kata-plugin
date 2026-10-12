@@ -32,6 +32,11 @@ Hardening, plus three new agent adapters:
   egress policy, resources and the agent config mount.
 - CI: GitHub Actions runs `cargo fmt --check`, `clippy -D warnings`,
   `cargo test` and `sh -n` over the scripts.
+- Supply chain: `deny.toml` (cargo-deny 0.20 schema, verified against
+  0.20.2) audits licenses/bans/sources; vulnerabilities and unsound
+  advisories fail closed. CI runs it via `.github/workflows/deny.yml`
+  (advisories on continue-on-error so a new advisory can't break an
+  unrelated PR).
 
 ## 0.3.0 (2026-10-12)
 
