@@ -32,6 +32,17 @@ pub fn default_agent() -> &'static str {
     "codex"
 }
 
+/// Default guest image for an agent when neither `config.toml` nor the
+/// profile sets one: the project's published image on GHCR, pinned to this
+/// plugin's version so the guest entrypoint and firewall scripts stay in sync
+/// with the plugin driving them.
+pub fn default_guest_image(agent_id: &str) -> String {
+    format!(
+        "ghcr.io/nizarfadlan/herdr-kata-{agent_id}:{}",
+        env!("CARGO_PKG_VERSION")
+    )
+}
+
 /// Built-in adapters keyed by agent id.
 pub fn builtin_agents() -> Vec<(String, Adapter)> {
     vec![
@@ -41,9 +52,9 @@ pub fn builtin_agents() -> Vec<(String, Adapter)> {
                 title: "Codex".to_string(),
                 command: words(&["codex"]),
                 default_args: Vec::new(),
-                // TODO: verify the real resume semantics of `codex`
-                // before filling this in; do not guess.
-                resume_args: Vec::new(),
+                // `codex resume --last` reopens the most recent session for
+                // the working directory (/work inside the microVM).
+                resume_args: words(&["resume", "--last"]),
                 herdr_detection_kind: Some("codex".to_string()),
                 profile: "profiles/herdr-codex-kata.json".to_string(),
             },
@@ -77,9 +88,9 @@ pub fn builtin_agents() -> Vec<(String, Adapter)> {
                 title: "Pi".to_string(),
                 command: words(&["pi"]),
                 default_args: Vec::new(),
-                // TODO: verify pi's resume semantics before filling this in;
-                // do not guess.
-                resume_args: Vec::new(),
+                // `pi --continue` reopens the most recent session for the
+                // working directory.
+                resume_args: words(&["--continue"]),
                 herdr_detection_kind: None,
                 profile: "profiles/herdr-pi-kata.json".to_string(),
             },
@@ -116,11 +127,24 @@ mod tests {
         let adapter = find_adapter(default_agent()).expect("codex adapter exists");
         assert_eq!(adapter.title, "Codex");
         assert_eq!(adapter.command, words(&["codex"]));
+        assert_eq!(adapter.resume_args, words(&["resume", "--last"]));
     }
 
     #[test]
     fn unknown_agent_is_none() {
         assert!(find_adapter("does-not-exist").is_none());
+    }
+
+    #[test]
+    fn default_guest_image_is_version_pinned() {
+        let image = default_guest_image("codex");
+        assert_eq!(
+            image,
+            format!(
+                "ghcr.io/nizarfadlan/herdr-kata-codex:{}",
+                env!("CARGO_PKG_VERSION")
+            )
+        );
     }
 
     #[test]
@@ -131,6 +155,7 @@ mod tests {
 
         let pi = find_adapter("pi").expect("pi adapter exists");
         assert_eq!(pi.command, words(&["pi"]));
+        assert_eq!(pi.resume_args, words(&["--continue"]));
 
         let omp = find_adapter("omp").expect("omp adapter exists");
         assert_eq!(omp.command, words(&["omp"]));

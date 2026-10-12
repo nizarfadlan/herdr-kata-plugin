@@ -42,6 +42,22 @@ herdr plugin action invoke install-keybindings --plugin kata.microvm
 
 Then open Herdr in a project, focus a pane and press **`prefix+Shift+a`**.
 
+## Install details
+
+`herdr plugin install` clones the repo and runs `scripts/install-binary.sh`
+(the manifest's `[[build]]` step), which installs `bin/herdr-kata`:
+
+1. it downloads the release binary matching `herdr-plugin.toml`'s `version`
+   (`releases/download/v<version>/herdr-kata-<version>-<target>`) and checks
+   its sha256 against the release's `SHA256SUMS` — no Rust toolchain needed;
+2. when there is no such release (or no network), it falls back to
+   `cargo build --release`.
+
+The guest images work the same way: when neither `config.toml` nor the
+profile sets `image`, the plugin pulls
+`ghcr.io/nizarfadlan/herdr-kata-<agent>:<version>` (published automatically
+on every release tag). Override with a pinned image of your own any time.
+
 ## Key bindings
 
 | Chord | Action | Does |

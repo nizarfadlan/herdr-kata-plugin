@@ -5,9 +5,13 @@
 Hardening, plus three new agent adapters:
 
 - New adapters: `claude` (Claude Code, resume via `--continue`), `pi` (pi.dev,
-  resume semantics not yet verified), `omp` (Oh My Pi, resume via `--resume`);
-  each with a Kata profile (`profiles/herdr-<agent>-kata.json`) and a guest
-  Dockerfile (`guest/Dockerfile.<agent>`).
+  resume via `--continue`), `omp` (Oh My Pi, resume via `--resume`);
+  `codex` resumes via `codex resume --last`; each with a Kata profile
+  (`profiles/herdr-<agent>-kata.json`) and a guest Dockerfile
+  (`guest/Dockerfile.<agent>`).
+- Guest images: when neither `config.toml` nor the profile sets `image`, the
+  plugin now pulls `ghcr.io/nizarfadlan/herdr-kata-<agent>:<version>`
+  (published automatically on every release tag) instead of failing.
 
 - Resource limits: the profile's `vcpus`/`memory_mb` become Kata OCI
   annotations (`io.katacontainers.config.hypervisor.default_vcpus` /

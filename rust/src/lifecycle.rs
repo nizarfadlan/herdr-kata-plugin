@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
-use crate::agents::find_adapter;
+use crate::agents::{default_guest_image, find_adapter};
 use crate::config::PluginConfig;
 use crate::context::{context_object, resolve_workspace_root, Env};
 use crate::errors::{ErrorKind, PluginError, Result};
@@ -199,11 +199,7 @@ impl Lifecycle {
         } else if !profile.image.is_empty() {
             profile.image.clone()
         } else {
-            return Err(PluginError::new(
-                ErrorKind::Config,
-                "no guest image configured: set `image` in config.toml or in the profile, \
-                 or build one from guest/Dockerfile.<agent>",
-            ));
+            default_guest_image(&self.config.agent)
         };
         if !self.backend.image_exists(&image) {
             return Err(PluginError::new(

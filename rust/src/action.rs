@@ -141,7 +141,7 @@ fn doctor(env: &Env) -> Result<i32> {
 
 /// Resolves the guest image for the configured agent.
 fn image_for(lifecycle: &Lifecycle) -> Result<String> {
-    use crate::agents::find_adapter;
+    use crate::agents::{default_guest_image, find_adapter};
     use crate::lifecycle::load_profile;
     let adapter = find_adapter(&lifecycle.config.agent).ok_or_else(|| {
         PluginError::new(
@@ -155,10 +155,7 @@ fn image_for(lifecycle: &Lifecycle) -> Result<String> {
     } else if !profile.image.is_empty() {
         Ok(profile.image.clone())
     } else {
-        Err(PluginError::new(
-            ErrorKind::Config,
-            "no guest image configured: set `image` in config.toml or in the profile",
-        ))
+        Ok(default_guest_image(&lifecycle.config.agent))
     }
 }
 
