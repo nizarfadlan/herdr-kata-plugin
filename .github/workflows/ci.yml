@@ -27,3 +27,8 @@ jobs:
           sh -n scripts/run-action.sh
           sh -n guest/egress.sh
           sh -n guest/entrypoint.sh
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
