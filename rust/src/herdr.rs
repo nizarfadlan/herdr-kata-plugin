@@ -216,9 +216,13 @@ mod tests {
     fn fake_herdr() -> String {
         let dir = tempfile::tempdir().expect("tempdir");
         let path = dir.path().join("herdr");
-        let mut file = std::fs::File::create(&path).expect("create");
-        writeln!(
-            file,
+        // Close the write handle in its own scope before the script is ever
+        // executed: on some filesystems exec'ing a just-written file can hit
+        // ETXTBSY ("Text file busy") while a writer is still open.
+        {
+            let mut file = std::fs::File::create(&path).expect("create");
+            writeln!(
+                file,
             r#"#!/bin/sh
 case "$1 $2" in
   "pane split") echo '{{"result":{{"pane":{{"pane_id":"pane-new-1"}}}}}}' ;;
@@ -231,6 +235,8 @@ case "$1 $2" in
 esac"#
         )
         .expect("write");
+            file.sync_all().expect("sync");
+        }
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt as _;
