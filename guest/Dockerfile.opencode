@@ -1,4 +1,4 @@
-# Guest image for the OpenCode agent (Phase 2)
+# Guest image for the OpenCode agent.
 #
 # Minimal image: the agent binary + CA certificates. Nothing else from the
 # host is baked in; the worktree and the agent config are mounted at launch.

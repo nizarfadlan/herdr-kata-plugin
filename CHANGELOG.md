@@ -2,7 +2,12 @@
 
 ## 0.4.0 (2026-10-12)
 
-Hardening:
+Hardening, plus three new agent adapters:
+
+- New adapters: `claude` (Claude Code, resume via `--continue`), `pi` (pi.dev,
+  resume semantics not yet verified), `omp` (Oh My Pi, resume via `--resume`);
+  each with a Kata profile (`profiles/herdr-<agent>-kata.json`) and a guest
+  Dockerfile (`guest/Dockerfile.<agent>`).
 
 - Resource limits: the profile's `vcpus`/`memory_mb` become Kata OCI
   annotations (`io.katacontainers.config.hypervisor.default_vcpus` /

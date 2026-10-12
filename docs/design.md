@@ -98,7 +98,7 @@ rust/src/
 ```
 
 - **`kata.rs`** (replaces `nono.rs`): a `KataDriver` trait + `CtrBackend`; `classify_failure` from `ctr` output; normalisation of `ctr` listings into `MicroVm { id, runtime, status, … }`; an argv builder for `ctr run` (runtime flag, mounts, `--rm`, `-t`).
-- **`agents.rs`**: generic adapters — `{ title, command, default_args, resume_args, profile, herdr_detection_kind }`. Built in: **`codex`** (default) and **`opencode`** (single-VM mode; no client/server split — a simplification vs. the example). Custom agents via config (the example's pattern).
+- **`agents.rs`**: generic adapters — `{ title, command, default_args, resume_args, profile, herdr_detection_kind }`. Built in: **`codex`** (default), **`opencode`**, **`claude`**, **`pi`**, **`omp`** (single-VM mode; no client/server split — a simplification vs. the example). Custom agents via config (the example's pattern).
 - **`profiles/`**: `profiles/herdr-codex-kata.json`, `profiles/herdr-opencode-kata.json` — `{ vcpus, memory_mb, image, mounts, egress_allowlist }`. (Not nono profiles; the plugin's own format, resolved by `kata.rs`.)
 - **`verify.rs`**: host-side checks via containerd — the container exists and uses the Kata runtime; the OCI spec does not mount sensitive host paths (`~/.ssh`, `/run/herdr`, …); the escape probe from inside the VM fails to reach the host.
 - **`probes.rs`**: runs inside a throwaway VM: tries to read a host-only marker file, tries `connect()` to the visible Herdr socket, tries egress to a non-allowlisted host — all must fail; JSON output for `doctor`.

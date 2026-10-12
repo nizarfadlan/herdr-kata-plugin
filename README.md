@@ -28,7 +28,7 @@ hardware-virtualized microVM (Kata Containers via containerd):
 - Herdr 0.9+
 - containerd + Kata Containers installed, runtime `io.containerd.kata.v2` registered (one-time root setup — see `kata/README.md`)
 - your user can talk to `/run/containerd/containerd.sock`
-- a coding agent available **inside the guest image** (Codex default, OpenCode supported)
+- a coding agent available **inside the guest image** (Codex default; OpenCode, Claude Code, Pi and Oh My Pi also supported)
 
 Run `doctor` first; it checks all of this and starts nothing.
 
@@ -88,7 +88,7 @@ Kata runtime itself could not boot there):
 `config.toml` there (all keys optional):
 
 ```toml
-agent = "codex"                  # codex (default) | opencode
+agent = "codex"                  # codex (default) | opencode | claude | pi | omp
 kata_bin = "ctr"                 # ctr | nerdctl
 containerd_socket = "/run/containerd/containerd.sock"
 containerd_namespace = "herdr-kata"

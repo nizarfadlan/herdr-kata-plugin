@@ -1,0 +1,30 @@
+# Guest image for the Oh My Pi agent (omp.sh).
+#
+# Minimal image: the agent binary + CA certificates. Nothing else from the
+# host is baked in; the worktree and the agent config are mounted at launch.
+#
+# omp ships an install script; the binary lands in /usr/local/bin.
+
+FROM debian:bookworm-slim AS omp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates curl iptables && \
+    rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL -A 'Mozilla/5.0' https://omp.sh/install -o /tmp/omp-install.sh && \
+    chmod +x /tmp/omp-install.sh && \
+    PI_INSTALL_DIR=/usr/local/bin /tmp/omp-install.sh --binary && \
+    rm /tmp/omp-install.sh
+
+FROM debian:bookworm-slim
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates iptables && \
+    rm -rf /var/lib/apt/lists/*
+COPY --from=omp /usr/local/bin/omp /usr/local/bin/omp
+# A non-root user; the entrypoint drops to it after applying the firewall.
+RUN useradd -m -s /bin/bash agent
+# Egress firewall + entrypoint. No USER directive on purpose: the entrypoint
+# starts as root, applies the firewall, then drops to `agent` itself.
+COPY guest/egress.sh guest/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/egress.sh /usr/local/bin/entrypoint.sh
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["omp"]

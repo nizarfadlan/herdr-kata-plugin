@@ -59,6 +59,43 @@ pub fn builtin_agents() -> Vec<(String, Adapter)> {
                 profile: "profiles/herdr-opencode-kata.json".to_string(),
             },
         ),
+        (
+            "claude".to_string(),
+            Adapter {
+                title: "Claude Code".to_string(),
+                command: words(&["claude"]),
+                default_args: Vec::new(),
+                // `claude --continue` resumes the most recent conversation.
+                resume_args: words(&["--continue"]),
+                herdr_detection_kind: None,
+                profile: "profiles/herdr-claude-kata.json".to_string(),
+            },
+        ),
+        (
+            "pi".to_string(),
+            Adapter {
+                title: "Pi".to_string(),
+                command: words(&["pi"]),
+                default_args: Vec::new(),
+                // TODO: verify pi's resume semantics before filling this in;
+                // do not guess.
+                resume_args: Vec::new(),
+                herdr_detection_kind: None,
+                profile: "profiles/herdr-pi-kata.json".to_string(),
+            },
+        ),
+        (
+            "omp".to_string(),
+            Adapter {
+                title: "Oh My Pi".to_string(),
+                command: words(&["omp"]),
+                default_args: Vec::new(),
+                // `omp --resume` continues the previous session.
+                resume_args: words(&["--resume"]),
+                herdr_detection_kind: None,
+                profile: "profiles/herdr-omp-kata.json".to_string(),
+            },
+        ),
     ]
 }
 
@@ -84,5 +121,19 @@ mod tests {
     #[test]
     fn unknown_agent_is_none() {
         assert!(find_adapter("does-not-exist").is_none());
+    }
+
+    #[test]
+    fn new_adapters_resolve() {
+        let claude = find_adapter("claude").expect("claude adapter exists");
+        assert_eq!(claude.command, words(&["claude"]));
+        assert_eq!(claude.resume_args, words(&["--continue"]));
+
+        let pi = find_adapter("pi").expect("pi adapter exists");
+        assert_eq!(pi.command, words(&["pi"]));
+
+        let omp = find_adapter("omp").expect("omp adapter exists");
+        assert_eq!(omp.command, words(&["omp"]));
+        assert_eq!(omp.resume_args, words(&["--resume"]));
     }
 }

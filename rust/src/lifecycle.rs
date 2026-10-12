@@ -188,7 +188,7 @@ impl Lifecycle {
             PluginError::new(
                 ErrorKind::Config,
                 format!(
-                    "unknown agent \"{}\": configure agent = codex|opencode",
+                    "unknown agent \"{}\": configure agent = codex|opencode|claude|pi|omp",
                     self.config.agent
                 ),
             )

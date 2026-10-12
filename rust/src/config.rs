@@ -13,7 +13,8 @@ use crate::errors::{ErrorKind, PluginError, Result};
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct PluginConfig {
-    /// Agent adapter id: `codex` (default), `opencode`, or a custom agent.
+    /// Agent adapter id: `codex` (default), `opencode`, `claude`, `pi`,
+    /// `omp`, or a custom agent.
     pub agent: String,
     /// Containerd CLI used by the Kata driver (`ctr` or `nerdctl`).
     pub kata_bin: String,
